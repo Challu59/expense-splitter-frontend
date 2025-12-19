@@ -6,6 +6,14 @@ class ApiService{
   static const String baseUrl = "http://10.0.2.2:8000/api";
   static final storage = FlutterSecureStorage();
 
+  static Future<Map<String, String>> _authHeaders() async{
+    final accessToken = await(storage.read(key: "access"));
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+}
+
   static Future<bool> register(String email, String username, String name, String password,) async{
     final response = await http.post(
       Uri.parse("${baseUrl}/auth/register/"),
@@ -46,4 +54,32 @@ class ApiService{
       return false;
     }
   }
+
+  static Future<List> getGroups() async{
+    final response = await http.get(
+      Uri.parse("${baseUrl}/groups/"),
+      headers: await _authHeaders(),
+    );
+    if (response.statusCode == 200 ){
+      return jsonDecode(response.body);
+    }
+    else throw Exception(
+      "Error loading groups"
+    );
+  }
+
+  static Future<bool> createGroup(String name, String currency) async{
+      final response = await http.post(
+        Uri.parse("${baseUrl}/groups/"),
+        headers: await _authHeaders(),
+        body: jsonEncode(
+            {
+              'name' : name,
+              'currency' : currency,
+        }),
+      );
+      return response.statusCode == 201;
+  }
+
+
 }
