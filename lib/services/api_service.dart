@@ -81,5 +81,24 @@ class ApiService{
       return response.statusCode == 201;
   }
 
+  static Future<String?> inviteToGroup(int groupId, String email) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/groups/$groupId/invite"),
+      headers: await _authHeaders(),
+      body: jsonEncode({
+        "email": email,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      return null;
+    } else {
+      return data["detail"] ?? "Something went wrong";
+    }
+  }
+
+
 
 }
