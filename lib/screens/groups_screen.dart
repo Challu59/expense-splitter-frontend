@@ -9,6 +9,8 @@ class GroupsScreen extends StatefulWidget{
 class _GroupsScreenState extends State<GroupsScreen>{
   List groups = [];
   bool loading = true;
+
+
   void showInviteSheet(int groupId) {
     final emailController = TextEditingController();
     bool inviting = false;
@@ -194,12 +196,15 @@ class _GroupsScreenState extends State<GroupsScreen>{
               child: ListTile(
                 title: Text(group["name"]),
                 subtitle: Text("${group['members_count']} members"),
-                trailing: IconButton(
+                trailing: group["is_creator"] == true
+                    ? IconButton(
                   icon: const Icon(Icons.person_add),
                   onPressed: () {
                     showInviteSheet(group["id"]);
                   },
-                ),
+                )
+                    : null,
+
               ),
             );
 

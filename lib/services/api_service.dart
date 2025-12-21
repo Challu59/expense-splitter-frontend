@@ -47,6 +47,7 @@ class ApiService{
         final data = jsonDecode(response.body);
         await storage.write(key: 'access', value: data['access']);
         await storage.write(key: 'refresh', value: data['refresh']);
+        await storage.write(key: 'user_id', value: data['user_id'].toString());
         return true;
     }
     else{
@@ -97,6 +98,11 @@ class ApiService{
     } else {
       return data["detail"] ?? "Something went wrong";
     }
+  }
+
+  static Future<int?> getCurrentUserId() async {
+    final id = await storage.read(key: 'user_id');
+    return id != null ? int.parse(id) : null;
   }
 
 
