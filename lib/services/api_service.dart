@@ -105,6 +105,30 @@ class ApiService{
     return id != null ? int.parse(id) : null;
   }
 
+  static Future<String?> addExpense({
+    required int groupId,
+    required String amount,
+    required String description,
+    required String splitType,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/api/expenses/"),
+      headers: await _authHeaders(),
+      body: jsonEncode({
+        "group": groupId,
+        "amount": amount,
+        "description": description,
+        "split_type": splitType,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return null;
+    } else {
+      final data = jsonDecode(response.body);
+      return data["detail"] ?? "Failed to add expense";
+    }
+  }
 
 
 }
