@@ -105,6 +105,20 @@ class ApiService{
     return id != null ? int.parse(id) : null;
   }
 
+  static Future<List> getGroupExpenses(int groupId) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/groups/$groupId/expenses/"),
+      headers: await _authHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to load expenses");
+    }
+  }
+
+
   static Future<String?> addExpense({
     required int groupId,
     required String amount,
@@ -112,7 +126,7 @@ class ApiService{
     required String splitType,
   }) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/api/expenses/"),
+      Uri.parse("$baseUrl/expenses/"),
       headers: await _authHeaders(),
       body: jsonEncode({
         "group": groupId,
@@ -127,6 +141,19 @@ class ApiService{
     } else {
       final data = jsonDecode(response.body);
       return data["detail"] ?? "Failed to add expense";
+    }
+  }
+
+  static Future<Map<String, dynamic>> getGroupDetail(int groupId) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/groups/$groupId/detail/"),
+      headers: await _authHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to load group detail");
     }
   }
 

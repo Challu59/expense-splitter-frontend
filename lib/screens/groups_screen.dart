@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'add_expense_screen.dart';
+import 'group_detail_screen.dart';
 
 class GroupsScreen extends StatefulWidget{
   @override
@@ -209,10 +210,14 @@ class _GroupsScreenState extends State<GroupsScreen>{
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => AddExpenseScreen(groupId: group["id"]),
+                      builder: (_) => GroupDetailScreen(
+                        groupId: group["id"],
+                        groupName: group["name"],
+                      ),
                     ),
                   );
                 },
+
 
               ),
 
