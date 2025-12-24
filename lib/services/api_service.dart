@@ -153,9 +153,10 @@ class ApiService{
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Failed to load group detail");
+      throw Exception("Failed to load group detail: ${response.statusCode} - ${response.body}");
     }
   }
+
 
 
 }

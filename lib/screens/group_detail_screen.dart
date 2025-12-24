@@ -18,33 +18,29 @@ class GroupDetailScreen extends StatefulWidget {
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   bool loading = true;
-
   List expenses = [];
   List members = [];
-  double totalExpense = 0;
+  int totalExpense = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchGroupData();
+    fetchGroupDetails();
   }
 
-  Future<void> fetchGroupData() async {
+  Future<void> fetchGroupDetails() async {
+    setState(() => loading = true);
+
     try {
-      final groupData =
-      await ApiService.getGroupDetail(widget.groupId);
-      final expenseData =
-      await ApiService.getGroupExpenses(widget.groupId);
-
-      double total = 0;
-      for (var e in expenseData) {
-        total += double.parse(e["amount"].toString());
-      }
-
+      final groupData = await ApiService.getGroupDetail(widget.groupId);
       setState(() {
-        members = groupData["members"] ?? [];
+        members = groupData['members'] ?? [];
+        totalExpense = groupData['total_expense'] ?? 0;
+      });
+
+      final expenseData = await ApiService.getGroupExpenses(widget.groupId);
+      setState(() {
         expenses = expenseData;
-        totalExpense = total;
         loading = false;
       });
     } catch (e) {
@@ -61,7 +57,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       appBar: AppBar(
         title: Text(widget.groupName),
       ),
-
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
@@ -71,13 +66,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               builder: (_) => AddExpenseScreen(groupId: widget.groupId),
             ),
           );
-
           if (added == true) {
-            fetchGroupData();
+            fetchGroupDetails();
           }
         },
       ),
-
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -97,37 +90,22 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   Text(
-                    "Members (${members.length})",
+                    "Members (${members.length}): " +
+                        members.map((m) => m['name'] ?? 'Unknown').join(', '),
                     style: const TextStyle(color: Colors.grey),
                   ),
-
                   const SizedBox(height: 8),
-
-                  Wrap(
-                    spacing: 8,
-                    children: members.map<Widget>((m) {
-                      return Chip(
-                        label: Text(m["username"]),
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 12),
-
                   Text(
                     "Total Expense: Rs. $totalExpense",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
             ),
           ),
 
-          /// EXPENSE LIST
+          // Expenses List
           Expanded(
             child: expenses.isEmpty
                 ? const Center(
@@ -146,8 +124,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   child: ListTile(
                     title: Text(expense["description"]),
                     subtitle: Text(
-                      "Paid by ${expense["paid_by_name"]}",
-                    ),
+                        "Paid by ${expense["paid_by_name"] ?? 'Unknown'}"),
                     trailing: Text(
                       "Rs. ${expense["amount"]}",
                       style: const TextStyle(
