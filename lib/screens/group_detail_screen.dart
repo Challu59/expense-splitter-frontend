@@ -56,6 +56,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.groupName),
+
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
