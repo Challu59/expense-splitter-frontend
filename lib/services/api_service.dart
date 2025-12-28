@@ -124,16 +124,23 @@ class ApiService{
     required String amount,
     required String description,
     required String splitType,
+    List<Map<String, dynamic>>? splits,
   }) async {
+    final body = {
+      "group": groupId,
+      "amount": amount,
+      "description": description,
+      "split_type": splitType,
+    };
+    
+    if (splits != null && splits.isNotEmpty) {
+      body["splits"] = splits;
+    }
+
     final response = await http.post(
       Uri.parse("$baseUrl/expenses/"),
       headers: await _authHeaders(),
-      body: jsonEncode({
-        "group": groupId,
-        "amount": amount,
-        "description": description,
-        "split_type": splitType,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 201) {

@@ -37,7 +37,17 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         members = groupData['members'] ?? [];
         totalExpense = groupData['total_expense'] ?? 0;
       });
+    } catch (e) {
+      setState(() {
+        members = [];
+        totalExpense = 0;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load group details: ${e.toString()}")),
+      );
+    }
 
+    try {
       final expenseData = await ApiService.getGroupExpenses(widget.groupId);
       setState(() {
         expenses = expenseData;
@@ -46,7 +56,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     } catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to load group details")),
+        SnackBar(content: Text("Failed to load expenses: ${e.toString()}")),
       );
     }
   }
@@ -119,24 +129,62 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               itemCount: expenses.length,
               itemBuilder: (context, index) {
                 final expense = expenses[index];
+
                 return Card(
                   margin: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  elevation: 2,
                   child: ListTile(
-                    title: Text(expense["description"]),
-                    subtitle: Text(
-                        "Paid by ${expense["paid_by_name"] ?? 'Unknown'}"),
-                    trailing: Text(
-                      "Rs. ${expense["amount"]}",
+                    contentPadding: const EdgeInsets.all(12),
+
+                    title: Text(
+                      expense["description"] ?? "No description",
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
+
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+
+                        Text(
+                          "Paid by ${expense["paid_by_name"] ?? "Unknown"}",
+                          style: const TextStyle(fontSize: 13),
+                        ),
+
+                        const SizedBox(height: 2),
+
+                        Text(
+                          "Split: ${(expense["split_type"] ?? "equal").toString().toUpperCase()}",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    trailing: Text(
+                      "Rs. ${expense["amount"] ?? "0.00"}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+
+                    onTap: () {
+                    },
                   ),
                 );
               },
             ),
-          ),
+          )
+
         ],
       ),
     );
