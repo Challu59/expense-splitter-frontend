@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'add_expense_screen.dart';
+import 'balances_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final int groupId;
@@ -66,7 +67,22 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.groupName),
-
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BalancesScreen(
+                    groupId: widget.groupId,
+                    groupName: widget.groupName,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
