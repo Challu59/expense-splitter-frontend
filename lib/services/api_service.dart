@@ -125,6 +125,7 @@ class ApiService{
     required String description,
     required String splitType,
     List<Map<String, dynamic>>? splits,
+    List<Map<String, dynamic>>? payments,
   }) async {
     final body = {
       "group": groupId,
@@ -135,6 +136,9 @@ class ApiService{
     
     if (splits != null && splits.isNotEmpty) {
       body["splits"] = splits;
+    }
+    if (payments != null && payments.isNotEmpty) {
+      body["payments"] = payments;
     }
 
     final response = await http.post(

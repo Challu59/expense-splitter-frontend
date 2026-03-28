@@ -62,6 +62,27 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     }
   }
 
+  String _paidSummaryText(dynamic expense) {
+    if (expense is! Map) return '';
+    final raw = expense['payments'];
+    if (raw is List && raw.isNotEmpty) {
+      if (raw.length == 1) {
+        final p = raw.first;
+        if (p is Map) {
+          return 'Paid by ${p['user_name'] ?? 'Unknown'} — Rs. ${p['amount']}';
+        }
+      }
+      final parts = <String>[];
+      for (final item in raw) {
+        if (item is Map) {
+          parts.add('${item['user_name'] ?? '?'}: ${item['amount']}');
+        }
+      }
+      return 'Paid: ${parts.join(' · ')}';
+    }
+    return 'Paid by ${expense['paid_by_name'] ?? 'Unknown'}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,7 +189,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         const SizedBox(height: 4),
 
                         Text(
-                          "Paid by ${expense["paid_by_name"] ?? "Unknown"}",
+                          _paidSummaryText(expense),
                           style: const TextStyle(fontSize: 13),
                         ),
 

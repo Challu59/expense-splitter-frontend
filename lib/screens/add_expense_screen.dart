@@ -14,6 +14,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final amountController = TextEditingController();
   final descriptionController = TextEditingController();
   final Map<int, TextEditingController> splitControllers = {};
+  final Map<int, TextEditingController> paymentControllers = {};
 
   String splitType = "equal";
   bool loading = false;
@@ -32,7 +33,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       setState(() {
         members = groupData['members'] ?? [];
         for (var member in members) {
-          splitControllers[member['user_id']] = TextEditingController();
+          final uid = member['user_id'] as int;
+          splitControllers[uid] = TextEditingController();
+          paymentControllers[uid] = TextEditingController();
         }
         loadingMembers = false;
       });
@@ -51,7 +54,33 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     for (var controller in splitControllers.values) {
       controller.dispose();
     }
+    for (var controller in paymentControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  bool _anyPaymentFilled() {
+    for (var c in paymentControllers.values) {
+      if (c.text.trim().isNotEmpty) return true;
+    }
+    return false;
+  }
+
+  List<Map<String, dynamic>>? buildPayments() {
+    if (!_anyPaymentFilled()) return null;
+    final List<Map<String, dynamic>> out = [];
+    for (var member in members) {
+      final userId = member['user_id'] as int;
+      final controller = paymentControllers[userId];
+      if (controller != null && controller.text.trim().isNotEmpty) {
+        out.add({
+          "user": userId,
+          "amount": controller.text.trim(),
+        });
+      }
+    }
+    return out;
   }
 
   List<Map<String, dynamic>> buildSplits() {
@@ -107,6 +136,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       }
     }
 
+    final payments = buildPayments();
+    if (payments != null) {
+      double paySum = 0;
+      for (final p in payments) {
+        paySum += double.tryParse(p['amount'] as String) ?? 0;
+      }
+      final totalExp = double.tryParse(amountController.text.trim()) ?? 0;
+      if ((paySum - totalExp).abs() > 0.01) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                "Amounts paid (sum) must equal the expense total"),
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => loading = true);
 
     List<Map<String, dynamic>> splits = [];
@@ -120,6 +167,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       description: descriptionController.text,
       splitType: splitType,
       splits: splits,
+      payments: payments,
     );
 
     setState(() => loading = false);
@@ -156,6 +204,41 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     controller: descriptionController,
                     decoration: const InputDecoration(labelText: "Description"),
                   ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Who paid?",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Leave all blank if you (logged-in user) paid the full amount. "
+                    "Otherwise enter each member's share of what was actually paid; they must add up to the total.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...members.map((member) {
+                    final userId = member['user_id'] as int;
+                    final controller = paymentControllers[userId];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TextField(
+                        controller: controller,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        decoration: InputDecoration(
+                          labelText: "${member['name']} (paid)",
+                          hintText: "0 — omit if they paid nothing",
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 16),
                   DropdownButtonFormField(
                     value: splitType,
