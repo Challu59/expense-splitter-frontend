@@ -180,4 +180,40 @@ class ApiService{
       throw Exception("Failed to load balances");
     }
   }
+
+  static Future<String?> createSettlement({
+    required int groupId,
+    required int toUserId,
+    required String amount,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/settlements/"),
+      headers: await _authHeaders(),
+      body: jsonEncode({
+        "group": groupId,
+        "to_user": toUserId,
+        "amount": amount,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return null;
+    }
+
+    final data = jsonDecode(response.body);
+    return data["detail"] ?? "Failed to create settlement";
+  }
+
+  static Future<List> getGroupSettlementHistory(int groupId) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/groups/$groupId/settlements/"),
+      headers: await _authHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to load settlement history");
+    }
+  }
 }
