@@ -39,7 +39,7 @@ class RegisterScreen extends StatelessWidget {
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  hintText: "John Doe",
+                  hintText: "Your Name",
                   prefixIcon: Icon(Icons.person_outline),
                 ),
               ),
@@ -49,7 +49,7 @@ class RegisterScreen extends StatelessWidget {
               TextField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
-                  hintText: "johndoe123",
+                  hintText: "danger123",
                   prefixIcon: Icon(Icons.alternate_email),
                 ),
               ),
@@ -60,7 +60,7 @@ class RegisterScreen extends StatelessWidget {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
-                  hintText: "example@gmail.com",
+                  hintText: "anything@gmail.com",
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
               ),
@@ -71,7 +71,7 @@ class RegisterScreen extends StatelessWidget {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
-                  hintText: "••••••••",
+                  hintText: "******",
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
               ),

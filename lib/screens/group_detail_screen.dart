@@ -17,6 +17,13 @@ class GroupDetailScreen extends StatefulWidget {
   State<GroupDetailScreen> createState() => _GroupDetailScreenState();
 }
 
+int _intFromJson(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value.toString()) ?? 0;
+}
+
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   bool loading = true;
   List expenses = [];
@@ -36,7 +43,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       final groupData = await ApiService.getGroupDetail(widget.groupId);
       setState(() {
         members = groupData['members'] ?? [];
-        totalExpense = groupData['total_expense'] ?? 0;
+        totalExpense = _intFromJson(groupData['total_expense']);
       });
     } catch (e) {
       setState(() {
@@ -147,6 +154,25 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   Text(
                     "Total Expense: Rs. $totalExpense",
                     style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BalancesScreen(
+                              groupId: widget.groupId,
+                              groupName: widget.groupName,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.account_balance_wallet_outlined, size: 20),
+                      label: const Text("Balances & settlements"),
+                    ),
                   ),
                 ],
               ),

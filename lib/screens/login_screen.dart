@@ -42,7 +42,7 @@ class LoginScreen extends StatelessWidget {
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  hintText: "example@gmail.com",
+                  hintText: "anything@gmail.com",
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
               ),
@@ -54,7 +54,7 @@ class LoginScreen extends StatelessWidget {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
-                  hintText: "••••••••",
+                  hintText: "******",
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
               ),

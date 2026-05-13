@@ -44,10 +44,13 @@ class ApiService{
     );
 
     if(response.statusCode == 200){
-        final data = jsonDecode(response.body);
-        await storage.write(key: 'access', value: data['access']);
-        await storage.write(key: 'refresh', value: data['refresh']);
-        await storage.write(key: 'user_id', value: data['user_id'].toString());
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        await storage.write(key: 'access', value: data['access'] as String);
+        await storage.write(key: 'refresh', value: data['refresh'] as String);
+        final uid = data['user_id'];
+        if (uid != null) {
+          await storage.write(key: 'user_id', value: uid.toString());
+        }
         return true;
     }
     else{
@@ -102,7 +105,8 @@ class ApiService{
 
   static Future<int?> getCurrentUserId() async {
     final id = await storage.read(key: 'user_id');
-    return id != null ? int.parse(id) : null;
+    if (id == null || id.isEmpty) return null;
+    return int.tryParse(id);
   }
 
   static Future<List> getGroupExpenses(int groupId) async {
@@ -181,27 +185,39 @@ class ApiService{
     }
   }
 
+  /// Records a payment from the current user to [toUserId] inside the group.
+  /// Uses `POST /groups/:id/settlements/` (optional [note] is stored as settlement memo).
   static Future<String?> createSettlement({
     required int groupId,
     required int toUserId,
     required String amount,
+    String? note,
   }) async {
+    final body = <String, dynamic>{
+      "to_user": toUserId,
+      "amount": amount,
+    };
+    final trimmed = note?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) {
+      body["note"] = trimmed;
+    }
+
     final response = await http.post(
-      Uri.parse("$baseUrl/settlements/"),
+      Uri.parse("$baseUrl/groups/$groupId/settlements/"),
       headers: await _authHeaders(),
-      body: jsonEncode({
-        "group": groupId,
-        "to_user": toUserId,
-        "amount": amount,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 201) {
       return null;
     }
 
-    final data = jsonDecode(response.body);
-    return data["detail"] ?? "Failed to create settlement";
+    try {
+      final data = jsonDecode(response.body) as Map<String, dynamic>?;
+      return data?["detail"]?.toString() ?? "Failed to create settlement";
+    } catch (_) {
+      return "Failed to create settlement (${response.statusCode})";
+    }
   }
 
   static Future<List> getGroupSettlementHistory(int groupId) async {

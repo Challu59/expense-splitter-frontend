@@ -214,8 +214,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Leave all blank if you (logged-in user) paid the full amount. "
-                    "Otherwise enter each member's share of what was actually paid; they must add up to the total.",
+                    "Leave all blank if you paid the full amount. "
+                    "Otherwise enter each member's share of what was actually paid which must add up to the total.",
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[700],
