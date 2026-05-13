@@ -240,15 +240,18 @@ class _BalancesScreenState extends State<BalancesScreen> {
                                   : noteController.text.trim(),
                             );
                             if (!dialogContext.mounted) return;
-                            setModalState(() => submitting = false);
                             if (err == null) {
                               Navigator.pop(dialogContext);
                               if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Settlement recorded")),
-                              );
-                              fetchBalances();
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Settlement recorded")),
+                                );
+                                fetchBalances();
+                              });
                             } else {
+                              setModalState(() => submitting = false);
                               ScaffoldMessenger.of(dialogContext).showSnackBar(
                                 SnackBar(content: Text(err)),
                               );
@@ -269,8 +272,10 @@ class _BalancesScreenState extends State<BalancesScreen> {
         },
       );
       } finally {
-        amountController.dispose();
-        noteController.dispose();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          amountController.dispose();
+          noteController.dispose();
+        });
       }
     } catch (e, st) {
       assert(() {
