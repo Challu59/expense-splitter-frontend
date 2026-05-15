@@ -1,16 +1,24 @@
-# frontend
+# Expense Splitter (Frontend)
+This is the frontend for fullstack mobile app for splitting shared expenses with friends. Create groups, add expenses with flexible splits, see who owes whom, and record settlements when people pay each other back.
 
-A new Flutter project.
+## Features
 
-## Getting Started
+- User register and login.
+- Create groups and invite members.
+- Add expenses (equal, custom, or percentage split).
+- List the expenses.
+- Show balances and record settlements.
+- Make settlements.
 
-This project is a starting point for a Flutter application.
+## Tech used
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter
+- http package for API calls
+- flutter_secure_storage to save login tokens
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## How to run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Make sure the backend is running first (see the backend repo README).
+2. Open a terminal in this project folder and run:
+   flutter pub get
+   flutter run
