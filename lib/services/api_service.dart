@@ -219,17 +219,4 @@ class ApiService{
       return "Failed to create settlement (${response.statusCode})";
     }
   }
-
-  static Future<List> getGroupSettlementHistory(int groupId) async {
-    final response = await http.get(
-      Uri.parse("$baseUrl/groups/$groupId/settlements/"),
-      headers: await _authHeaders(),
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception("Failed to load settlement history");
-    }
-  }
 }
